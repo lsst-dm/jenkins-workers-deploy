@@ -1,0 +1,174 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: manager-prod
+spec:
+  containers:
+  - env:
+    - name: JSWARM_URL
+      value: https://rubin-ci.slac.stanford.edu/
+    - name: JSWARM_OTHER_ARGS
+      value: -webSocket
+    - name: JSWARM_MODE
+      value: normal
+    - name: JSWARM_LABELS
+      value: jenkins-manager
+    - name: JSWARM_EXECUTORS
+      value: "1"
+    - name: JSWARM_AGENT_NAME
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.name
+    - name: JSWARM_DISABLE_CLIENTS_UNIQUE_ID
+      value: "true"
+    - name: JSWARM_DELETE_EXISTING_CLIENTS
+      value: "true"
+    - name: JSWARM_USERNAME
+      valueFrom:
+        secretKeyRef:
+          key: JSWARM_USERNAME
+          name: agent-ldfc
+    - name: JSWARM_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          key: JSWARM_PASSWORD
+          name: agent-ldfc
+    - name: K8S_NODE_NAME
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: spec.nodeName
+    - name: K8S_POD_NAMESPACE
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.namespace
+    - name: K8S_POD_IP
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: status.podIP
+    - name: K8S_SWARM_REQUESTS_CPU
+      valueFrom:
+        resourceFieldRef:
+          containerName: swarm
+          divisor: "0"
+          resource: requests.cpu
+    - name: K8S_SWARM_LIMITS_CPU
+      valueFrom:
+        resourceFieldRef:
+          containerName: swarm
+          divisor: "0"
+          resource: limits.cpu
+    - name: K8S_SWARM_REQUESTS_MEMORY_GI
+      valueFrom:
+        resourceFieldRef:
+          containerName: swarm
+          divisor: 1Gi
+          resource: requests.memory
+    - name: K8S_SWARM_LIMIT_MEMORY_GI
+      valueFrom:
+        resourceFieldRef:
+          containerName: swarm
+          divisor: 1Gi
+          resource: limits.memory
+    - name: K8S_DIND_REQUESTS_CPU
+      valueFrom:
+        resourceFieldRef:
+          containerName: dind
+          divisor: "0"
+          resource: requests.cpu
+    - name: K8S_DIND_LIMITS_CPU
+      valueFrom:
+        resourceFieldRef:
+          containerName: dind
+          divisor: "0"
+          resource: limits.cpu
+    - name: K8S_DIND_REQUESTS_MEMORY_GI
+      valueFrom:
+        resourceFieldRef:
+          containerName: dind
+          divisor: 1Gi
+          resource: requests.memory
+    - name: K8S_DIND_LIMIT_MEMORY_GI
+      valueFrom:
+        resourceFieldRef:
+          containerName: dind
+          divisor: 1Gi
+          resource: limits.memory
+    - name: K8S_DOCKER_GC_REQUESTS_CPU_M
+      valueFrom:
+        resourceFieldRef:
+          containerName: docker-gc
+          divisor: 1m
+          resource: requests.cpu
+    - name: K8S_DOCKER_GC_LIMITS_CPU_M
+      valueFrom:
+        resourceFieldRef:
+          containerName: docker-gc
+          divisor: 1m
+          resource: limits.cpu
+    - name: K8S_DOCKER_GC_REQUESTS_MEMORY_MI
+      valueFrom:
+        resourceFieldRef:
+          containerName: docker-gc
+          divisor: 1Mi
+          resource: requests.memory
+    - name: K8S_DOCKER_GC_LIMIT_MEMORY_MI
+      valueFrom:
+        resourceFieldRef:
+          containerName: docker-gc
+          divisor: 1Mi
+          resource: limits.memory
+    image: ghcr.io/ktlim/jenkins-swarm-client:latest
+    imagePullPolicy: Always
+    name: swarm
+    resources:
+      limits:
+        cpu: "1"
+        memory: 2Gi
+      requests:
+        cpu: "1"
+        memory: 2Gi
+    securityContext:
+      allowPrivilegeEscalation: true
+      privileged: false
+      readOnlyRootFilesystem: false
+      runAsGroup: 202
+      runAsNonRoot: false
+      runAsUser: 48435
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /j
+      name: ws-manager-prod
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+  securityContext:
+    fsGroup: 4085
+    runAsGroup: 0
+    runAsNonRoot: false
+    runAsUser: 0
+  shareProcessNamespace: false
+  terminationGracePeriodSeconds: 30
+  volumes:
+  - emptyDir: {}
+    name: docker-graph-storage
+  - name: ws-manager-prod
+    persistentVolumeClaim:
+      claimName: manager-prod-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: manager-prod-pvc
+  namespace: default
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1500Gi
+    volumeMode: Filesystem
