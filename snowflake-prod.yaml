@@ -70,7 +70,7 @@ spec:
         - mountPath: /var/lib/docker
           name: docker-graph-storage
         - mountPath: /j
-          name: ws
+          name: ws-snowflake
       - command:
         - sh
         - -c
