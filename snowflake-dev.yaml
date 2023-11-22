@@ -114,8 +114,8 @@ spec:
           value: tcp://localhost:2375
         - name: JSWARM_URL
           value: https://rubin-ci-dev.slac.stanford.edu/
-        - name: JSWARM_OTHER_ARGS
-          value: -webSocket
+#        - name: JSWARM_OTHER_ARGS
+#          value: -webSocket
         - name: JSWARM_MODE
           value: normal
         - name: JSWARM_LABELS
