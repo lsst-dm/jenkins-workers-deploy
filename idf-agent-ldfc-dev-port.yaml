@@ -113,7 +113,7 @@ spec:
         - name: DOCKER_HOST
           value: tcp://localhost:2375
         - name: JSWARM_TUNNEL
-          value: 134.79.23.201:50000 #External IP & port of loadbalancer at SLAC
+          value: 134.79.23.201:20000 #External IP & port of loadbalancer at SLAC
         - name: JSWARM_URL
           value: https://rubin-ci-dev.slac.stanford.edu/
 #        - name: JSWARM_OTHER_ARGS
