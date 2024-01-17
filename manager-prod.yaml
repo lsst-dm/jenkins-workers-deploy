@@ -20,8 +20,8 @@ spec:
           value: "-javaagent:/usr/share/jenkins/jmx_prometheus_javaagent-0.11.0.jar=localhost:8080:/usr/share/jenkins/jmx_exporter.yaml"
         - name: JSWARM_URL
           value: https://rubin-ci.slac.stanford.edu/
-#        - name: JSWARM_OTHER_ARGS
-#          value: -webSocket
+        - name: JSWARM_OTHER_ARGS
+          value: -webSocket
         - name: JSWARM_MODE
           value: normal
         - name: JSWARM_LABELS
