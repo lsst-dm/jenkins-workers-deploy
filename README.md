@@ -6,3 +6,4 @@ Rubin DM Jenkins worker deployment at Google Cloud Kubernetes engine (prompt-pro
 - name: JSWARM_OTHER_ARGS
   value: -webSocket
 ```
+Agents are deployed via kubernetes statefulset. 
