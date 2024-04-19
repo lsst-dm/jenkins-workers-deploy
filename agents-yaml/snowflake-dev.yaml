@@ -228,7 +228,7 @@ spec:
               containerName: docker-gc
               divisor: 1Mi
               resource: limits.memory
-        image: ghcr.io/ktlim/jenkins-swarm-client:latest
+        image: ghcr.io/lsst-dm/jenkins-swarm-client:latest
         imagePullPolicy: Always
         livenessProbe:
           exec:
