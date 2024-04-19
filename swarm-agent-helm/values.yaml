@@ -42,7 +42,7 @@ dockergc:
     # docker-gc writes to /var by default
     runAsUser: 0
   image:
-    repository: lsstsqre/jenkins-swarm-client
+    repository: lsstsqre/docker-gc
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
     tag: "3.15-ldfc"
@@ -64,7 +64,7 @@ swarm:
     runAsUser: 888
     runAsGroup: 888
   image:
-    repository: lsstsqre/docker-gc
+    repository: lsstsqre/jenkins-swarm-client
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
     tag: "latest"
