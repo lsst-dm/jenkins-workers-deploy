@@ -86,7 +86,7 @@ spec:
               containerName: swarm
               divisor: 1Gi
               resource: limits.memory
-        image: ghcr.io/ktlim/jenkins-swarm-client:latest
+        image: ghcr.io/lsst-dm/jenkins-swarm-client:latest
         imagePullPolicy: Always
         livenessProbe:
           exec:
