@@ -4,7 +4,7 @@ metadata:
   name: idf-agent-ldfc
 spec:
   podManagementPolicy: Parallel
-  replicas: 6
+  replicas: 8
   revisionHistoryLimit: 10
   selector:
     matchLabels:
