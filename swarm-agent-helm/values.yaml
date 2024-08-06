@@ -15,19 +15,19 @@ replicaCount: 1
 dind:
   resources:
     limits:
-      cpu: "6"
-      memory: "30Gi"
+      cpu: "8"
+      memory: "64Gi"
     requests:
-      cpu: "6"
-      memory: "30Gi"
+      cpu: "8"
+      memory: "64Gi"
 
   securityContext:
     privileged: True
   image:
-    repository: lsstsqre/dind
+    repository: docker
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "18.09.5"
+    tag: "27.1.1-dind"
 
 # values for docker-gc container
 dockergc:
@@ -49,7 +49,7 @@ dockergc:
 
 # values for swarm container
 swarm:
-  agent_volume_size: "1023Gi"
+  agent_volume_size: "1500Gi"
   agent_labels:
   secret_name: "jswarm-secret"
   resources:
@@ -64,7 +64,7 @@ swarm:
     runAsUser: 888
     runAsGroup: 888
   image:
-    repository: lsstsqre/jenkins-swarm-client
+    repository: ghcr.io/lsst-dm/jenkins-swarm-client
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
     tag: "latest"
