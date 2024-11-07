@@ -15,7 +15,7 @@ spec:
     whenDeleted: Retain
     whenScaled: Retain
   podManagementPolicy: Parallel
-  replicas: 2
+  replicas: 8
   revisionHistoryLimit: 10
   selector:
     matchLabels:
