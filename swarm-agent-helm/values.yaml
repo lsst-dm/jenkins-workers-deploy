@@ -42,7 +42,7 @@ dockergc:
     # docker-gc writes to /var by default
     runAsUser: 0
   image:
-    repository: lsstsqre/docker-gc
+    repository: ghcr.io/lsst-dm/docker-docker-gc
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
     tag: "3.15-ldfc"
@@ -68,7 +68,6 @@ swarm:
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
     tag: "latest"
-
 
 ### Pod values
 podAnnotations: {}

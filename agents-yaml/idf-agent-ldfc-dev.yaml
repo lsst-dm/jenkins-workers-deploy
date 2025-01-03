@@ -88,7 +88,7 @@ spec:
           value: "1"
         - name: FORCE_IMAGE_REMOVAL
           value: "1"
-        image: lsstsqre/docker-gc:latest
+        image: ghcr.io/lsst-dm/docker-docker-gc:latest
         imagePullPolicy: Always
         name: docker-gc
         resources:

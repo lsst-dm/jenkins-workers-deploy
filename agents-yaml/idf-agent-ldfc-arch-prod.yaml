@@ -1,22 +1,24 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: snowflake-arch-dev
+  name: idf-agent-ldfc-arch64
   namespace: default
 spec:
   persistentVolumeClaimRetentionPolicy:
     whenDeleted: Retain
     whenScaled: Retain
   podManagementPolicy: Parallel
-  replicas: 1
+  replicas: 6
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: snowflake-arch-dev
+      app: idf-agent-ldfc-arch64
+  serviceName: ""
   template:
     metadata:
+      creationTimestamp: null
       labels:
-        app: snowflake-arch-dev
+        app: idf-agent-ldfc-arch64
     spec:
       nodeSelector:
         failure-domain.beta.kubernetes.io/zone: us-central1-a
@@ -58,10 +60,10 @@ spec:
           timeoutSeconds: 1
         resources:
           limits:
-            cpu: "8"
+            cpu: "12"
             memory: 64Gi
           requests:
-            cpu: "8"
+            cpu: "12"
             memory: 64Gi
         securityContext:
           allowPrivilegeEscalation: true
@@ -76,7 +78,7 @@ spec:
         - mountPath: /var/lib/docker
           name: docker-graph-storage
         - mountPath: /j
-          name: volume-arm-arch
+          name: volume-arm
       - command:
         - sh
         - -c
@@ -115,7 +117,7 @@ spec:
         terminationMessagePolicy: File
       - env:
         - name: JAVA_ARGS
-          value: "-javaagent:/usr/share/jenkins/jmx_prometheus_javaagent-0.11.0.jar=localhost:8080:/usr/share/jenkins/jmx_exporter.yaml"
+          value: -javaagent:/usr/share/jenkins/jmx_prometheus_javaagent-0.11.0.jar=localhost:8080:/usr/share/jenkins/jmx_exporter.yaml
         - name: DOCKER_HOST
           value: tcp://localhost:2375
         - name: JSWARM_URL
@@ -125,7 +127,7 @@ spec:
         - name: JSWARM_MODE
           value: normal
         - name: JSWARM_LABELS
-          value: snowflake-arch-dev-0
+          value: arm64
         - name: JSWARM_EXECUTORS
           value: "1"
         - name: JSWARM_AGENT_NAME
@@ -263,10 +265,10 @@ spec:
           timeoutSeconds: 1
         resources:
           limits:
-            cpu: "1"
+            cpu: 750m
             memory: 2Gi
           requests:
-            cpu: "1"
+            cpu: 750m
             memory: 2Gi
         securityContext:
           allowPrivilegeEscalation: true
@@ -279,7 +281,7 @@ spec:
         terminationMessagePolicy: File
         volumeMounts:
         - mountPath: /j
-          name: volume-arm-arch
+          name: volume-arm
       dnsPolicy: ClusterFirst
       nodeSelector:
         kubernetes.io/arch: arm64
@@ -301,7 +303,7 @@ spec:
     - apiVersion: v1
       kind: PersistentVolumeClaim
       metadata:
-        name: volume-arm-arch
+        name: volume-arm
       spec:
         accessModes:
           - ReadWriteOnce
