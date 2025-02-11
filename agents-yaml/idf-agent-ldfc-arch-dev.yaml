@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: snowflake-arch-dev
+  name: idf-agent-ldfc-arch64-dev
   namespace: default
 spec:
   persistentVolumeClaimRetentionPolicy:
@@ -12,11 +12,13 @@ spec:
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: snowflake-arch-dev
+      app: idf-agent-ldfc-arch64-dev
+  serviceName: ""
   template:
     metadata:
+      creationTimestamp: null
       labels:
-        app: snowflake-arch-dev
+        app: idf-agent-ldfc-arch64-dev
     spec:
       nodeSelector:
         failure-domain.beta.kubernetes.io/zone: us-central1-a
@@ -58,11 +60,11 @@ spec:
           timeoutSeconds: 1
         resources:
           limits:
-            cpu: "8"
-            memory: 64Gi
+            cpu: "15"
+            memory: 54Gi
           requests:
-            cpu: "8"
-            memory: 64Gi
+            cpu: "15"
+            memory: 54Gi
         securityContext:
           allowPrivilegeEscalation: true
           privileged: true
@@ -76,7 +78,7 @@ spec:
         - mountPath: /var/lib/docker
           name: docker-graph-storage
         - mountPath: /j
-          name: volume-arm-arch
+          name: volume-arm
       - command:
         - sh
         - -c
@@ -99,11 +101,11 @@ spec:
         name: docker-gc
         resources:
           limits:
-            cpu: 500m
-            memory: 512Mi
+            cpu: 250m
+            memory: 500Mi
           requests:
-            cpu: 500m
-            memory: 512Mi
+            cpu: 250m
+            memory: 500Mi
         securityContext:
           allowPrivilegeEscalation: true
           privileged: false
@@ -115,17 +117,17 @@ spec:
         terminationMessagePolicy: File
       - env:
         - name: JAVA_ARGS
-          value: "-javaagent:/usr/share/jenkins/jmx_prometheus_javaagent-0.11.0.jar=localhost:8080:/usr/share/jenkins/jmx_exporter.yaml"
+          value: -javaagent:/usr/share/jenkins/jmx_prometheus_javaagent-0.11.0.jar=localhost:8080:/usr/share/jenkins/jmx_exporter.yaml
         - name: DOCKER_HOST
           value: tcp://localhost:2375
         - name: JSWARM_URL
-          value: https://rubin-ci.slac.stanford.edu/
+          value: https://rubin-ci-dev.slac.stanford.edu/
         - name: JSWARM_TUNNEL
-          value: 134.79.23.234:20000
+          value: 134.79.23.201:20000
         - name: JSWARM_MODE
           value: normal
         - name: JSWARM_LABELS
-          value: snowflake-arch-dev-0
+          value: aarch64
         - name: JSWARM_EXECUTORS
           value: "1"
         - name: JSWARM_AGENT_NAME
@@ -193,7 +195,7 @@ spec:
               divisor: "0"
               resource: requests.cpu
         - name: K8S_DIND_LIMITS_CPU
-          valueFrom:
+          value:
             resourceFieldRef:
               containerName: dind
               divisor: "0"
@@ -263,10 +265,10 @@ spec:
           timeoutSeconds: 1
         resources:
           limits:
-            cpu: "1"
+            cpu: 750m
             memory: 2Gi
           requests:
-            cpu: "1"
+            cpu: 750m
             memory: 2Gi
         securityContext:
           allowPrivilegeEscalation: true
@@ -279,9 +281,10 @@ spec:
         terminationMessagePolicy: File
         volumeMounts:
         - mountPath: /j
-          name: volume-arm-arch
+          name: volume-arm
       dnsPolicy: ClusterFirst
       nodeSelector:
+        cloud.google.com/gke-nodepool: jenkins-workers-multiarch
         kubernetes.io/arch: arm64
       restartPolicy: Always
       schedulerName: default-scheduler
@@ -298,15 +301,15 @@ spec:
   updateStrategy:
     type: RollingUpdate
   volumeClaimTemplates:
-    - apiVersion: v1
+    #    - apiVersion: v1
       kind: PersistentVolumeClaim
       metadata:
-        name: volume-arm-arch
+        name: volume-arm
       spec:
         accessModes:
           - ReadWriteOnce
         resources:
           requests:
-            storage: 1500Gi
+            storage: "1500Gi"
         storageClassName: arm-volume
         volumeMode: Filesystem

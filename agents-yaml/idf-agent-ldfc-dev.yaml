@@ -14,6 +14,8 @@ spec:
       labels:
         app: idf-agent-ldfc-dev
     spec:
+      nodeSelector:
+        cloud.google.com/gke-nodepool: jenkins-workers-big
       containers:
       - args:
         - --host=tcp://localhost:2375
@@ -88,7 +90,7 @@ spec:
           value: "1"
         - name: FORCE_IMAGE_REMOVAL
           value: "1"
-        image: lsstsqre/docker-gc:latest
+        image: ghcr.io/lsst-dm/docker-docker-gc:latest
         imagePullPolicy: Always
         name: docker-gc
         resources:
