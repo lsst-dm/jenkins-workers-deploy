@@ -127,7 +127,7 @@ spec:
         - name: JSWARM_MODE
           value: normal
         - name: JSWARM_LABELS
-          value: arm64
+          value: arm64 linux-aarch64
         - name: JSWARM_EXECUTORS
           value: "1"
         - name: JSWARM_AGENT_NAME

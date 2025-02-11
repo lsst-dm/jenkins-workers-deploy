@@ -121,7 +121,7 @@ spec:
         - name: JSWARM_MODE
           value: normal
         - name: JSWARM_LABELS
-          value: docker ldfc
+          value: docker ldfc linux-64
         - name: JSWARM_EXECUTORS
           value: "1"
         - name: JSWARM_AGENT_NAME
