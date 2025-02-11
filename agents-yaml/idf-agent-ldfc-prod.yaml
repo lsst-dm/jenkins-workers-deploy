@@ -14,6 +14,8 @@ spec:
       labels:
         app: idf-agent-ldfc
     spec:
+      nodeSelector:
+        cloud.google.com/gke-nodepool: jenkins-workers-big
       containers:
         - args:
             - --host=tcp://localhost:2375
