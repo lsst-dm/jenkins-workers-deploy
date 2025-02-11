@@ -10,7 +10,7 @@ resource "google_container_node_pool" "jenkins_workers_big" {
     "us-central1-c",
   ]
   project = "prompt-proto"
-  version = "1.30.8-gke.1128000"
+  version = "1.30.8-gke.1261000"
 
   management {
     auto_repair  = true
@@ -74,13 +74,13 @@ resource "google_container_node_pool" "jenkins_workers_multiarch" {
   location           = "us-central1-c"
   max_pods_per_node  = 110
   name               = "jenkins-workers-multiarch"
-  node_count         = 7
-  initial_node_count = 7
+  node_count         = 6
+  initial_node_count = 6
   node_locations = [
     "us-central1-a",
   ]
   project = "prompt-proto"
-  version = "1.30.8-gke.1128000"
+  version = "1.30.8-gke.1261000"
 
   management {
     auto_repair  = true
