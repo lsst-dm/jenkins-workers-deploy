@@ -28,7 +28,6 @@ resource "google_container_node_pool" "jenkins_workers_big" {
     disk_size_gb                = 100
     disk_type                   = "pd-standard"
     enable_confidential_storage = false
-    guest_accelerator           = []
     image_type                  = "COS_CONTAINERD"
     labels                      = {}
     local_ssd_count             = 0
@@ -98,7 +97,6 @@ resource "google_container_node_pool" "jenkins_workers_multiarch" {
     disk_size_gb                = 100
     disk_type                   = "pd-standard"
     enable_confidential_storage = false
-    guest_accelerator           = []
     image_type                  = "COS_CONTAINERD"
     labels                      = {}
     local_ssd_count             = 0

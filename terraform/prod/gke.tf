@@ -108,7 +108,6 @@ resource "google_container_cluster" "jenkins_test" {
     disk_size_gb                = 100
     disk_type                   = "pd-standard"
     enable_confidential_storage = false
-    guest_accelerator           = []
     image_type                  = "COS_CONTAINERD"
     labels                      = {}
     local_ssd_count             = 0
@@ -172,7 +171,6 @@ resource "google_container_cluster" "jenkins_test" {
       disk_type    = "pd-standard"
       #  effective_taints            = []
       enable_confidential_storage = false
-      guest_accelerator           = []
       image_type                  = "COS_CONTAINERD"
       labels                      = {}
       local_ssd_count             = 0
@@ -251,7 +249,6 @@ resource "google_container_cluster" "jenkins_test" {
       #    },
       #  ]
       enable_confidential_storage = false
-      guest_accelerator           = []
       image_type                  = "COS_CONTAINERD"
       labels                      = {}
       local_ssd_count             = 0
@@ -335,7 +332,6 @@ resource "google_container_cluster" "jenkins_test" {
         cpu_cfs_quota      = false
       }
       enable_confidential_storage = false
-      guest_accelerator           = []
       image_type                  = "COS_CONTAINERD"
       labels                      = {}
       local_ssd_count             = 0
