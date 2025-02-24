@@ -7,9 +7,9 @@ allowedTopologies:
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: arm-volume
+  name: aarch-volume
 parameters:
-  type: pd-standard
+  type: hyperdisk-balanced
 provisioner: pd.csi.storage.gke.io
 reclaimPolicy: Delete
 volumeBindingMode: WaitForFirstConsumer

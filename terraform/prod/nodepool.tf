@@ -10,7 +10,7 @@ resource "google_container_node_pool" "jenkins_workers_big" {
     "us-central1-c",
   ]
   project = "prompt-proto"
-  version = "1.30.8-gke.1261000"
+  version = "1.30.9-gke.1046000"
 
   management {
     auto_repair  = true
@@ -68,18 +68,18 @@ resource "google_container_node_pool" "jenkins_workers_big" {
   }
 }
 
-resource "google_container_node_pool" "jenkins_workers_multiarch" {
+resource "google_container_node_pool" "jenkins_workers_multiarch_c4a" {
   cluster            = "jenkins-test"
   location           = "us-central1-c"
   max_pods_per_node  = 110
-  name               = "jenkins-workers-multiarch"
+  name               = "jenkins-workers-multiarch-c4a"
   node_count         = 6
   initial_node_count = 6
   node_locations = [
     "us-central1-a",
   ]
   project = "prompt-proto"
-  version = "1.30.8-gke.1261000"
+  version = "1.30.9-gke.1046000"
 
   management {
     auto_repair  = true
@@ -95,13 +95,13 @@ resource "google_container_node_pool" "jenkins_workers_multiarch" {
 
   node_config {
     disk_size_gb                = 100
-    disk_type                   = "pd-standard"
+    disk_type                   = "hyperdisk-balanced"
     enable_confidential_storage = false
     image_type                  = "COS_CONTAINERD"
     labels                      = {}
     local_ssd_count             = 0
     logging_variant             = "DEFAULT"
-    machine_type                = "t2a-standard-32"
+    machine_type                = "c4a-highmem-32"
     metadata = {
       "disable-legacy-endpoints" = "true"
     }
