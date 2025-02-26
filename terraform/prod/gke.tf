@@ -20,7 +20,7 @@ resource "google_container_cluster" "jenkins_test" {
   network                                  = "projects/prompt-proto/global/networks/prompt-proto-net"
   networking_mode                          = "VPC_NATIVE"
   node_locations                           = []
-  node_version                             = "1.30.8-gke.1261000"
+  node_version                             = "1.30.9-gke.1046000"
   project                                  = "prompt-proto"
   #resource_labels                          = {}
   subnetwork = "projects/prompt-proto/regions/us-central1/subnetworks/prompt-proto-sub-1"
@@ -152,7 +152,7 @@ resource "google_container_cluster" "jenkins_test" {
     node_locations = [
       "us-central1-c",
     ]
-    version = "1.30.8-gke.1261000"
+    version = "1.30.9-gke.1046000"
 
     management {
       auto_repair  = true
@@ -219,90 +219,12 @@ resource "google_container_cluster" "jenkins_test" {
     #  "https://www.googleapis.com/compute/v1/projects/prompt-proto/zones/us-central1-a/instanceGroups/gke-jenkins-test-jenkins-workers-mult-d7d482d0-grp",
     #]
     max_pods_per_node = 110
-    name              = "jenkins-workers-multiarch"
-    node_count        = 6
-    node_locations = [
-      "us-central1-a",
-    ]
-    version = "1.30.8-gke.1261000"
-
-    management {
-      auto_repair  = true
-      auto_upgrade = true
-    }
-
-    network_config {
-      create_pod_range     = false
-      enable_private_nodes = true
-      pod_ipv4_cidr_block  = "10.224.0.0/14"
-      pod_range            = "gke-jenkins-test-pods-ed1f94bc"
-    }
-
-    node_config {
-      disk_size_gb = 100
-      disk_type    = "pd-standard"
-      #  effective_taints = [
-      #    {
-      #      effect = "NO_SCHEDULE"
-      #      key    = "kubernetes.io/arch"
-      #      value  = "arm64"
-      #    },
-      #  ]
-      enable_confidential_storage = false
-      image_type                  = "COS_CONTAINERD"
-      labels                      = {}
-      local_ssd_count             = 0
-      logging_variant             = "DEFAULT"
-      machine_type                = "t2a-standard-32"
-      metadata = {
-        "disable-legacy-endpoints" = "true"
-      }
-      oauth_scopes = [
-        "https://www.googleapis.com/auth/devstorage.read_only",
-        "https://www.googleapis.com/auth/logging.write",
-        "https://www.googleapis.com/auth/monitoring",
-        "https://www.googleapis.com/auth/service.management.readonly",
-        "https://www.googleapis.com/auth/servicecontrol",
-        "https://www.googleapis.com/auth/trace.append",
-      ]
-      preemptible           = false
-      resource_labels       = {}
-      resource_manager_tags = {}
-      service_account       = "default"
-      spot                  = false
-      tags                  = []
-
-      shielded_instance_config {
-        enable_integrity_monitoring = true
-        enable_secure_boot          = true
-      }
-
-      workload_metadata_config {
-        mode = "GKE_METADATA"
-      }
-    }
-
-    upgrade_settings {
-      max_surge       = 1
-      max_unavailable = 0
-      strategy        = "SURGE"
-    }
-  }
-  node_pool {
-    initial_node_count = 6
-    #instance_group_urls = [
-    #  "https://www.googleapis.com/compute/v1/projects/prompt-proto/zones/us-central1-a/instanceGroupManagers/gke-jenkins-test-jenkins-workers-mult-d7d482d0-grp",
-    #]
-    #managed_instance_group_urls = [
-    #  "https://www.googleapis.com/compute/v1/projects/prompt-proto/zones/us-central1-a/instanceGroups/gke-jenkins-test-jenkins-workers-mult-d7d482d0-grp",
-    #]
-    max_pods_per_node = 110
     name              = "jenkins-workers-multiarch-c4a"
     node_count        = 6
     node_locations = [
       "us-central1-a",
     ]
-    version = "1.30.8-gke.1261000"
+    version = "1.30.9-gke.1046000"
 
     management {
       auto_repair  = true

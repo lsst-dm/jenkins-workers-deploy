@@ -1,27 +1,25 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: idf-agent-ldfc-arch64-dev
+  name: idf-agent-ldfc-arch-c4a
   namespace: default
 spec:
   persistentVolumeClaimRetentionPolicy:
     whenDeleted: Retain
     whenScaled: Retain
   podManagementPolicy: Parallel
-  replicas: 1
+  replicas: 6
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: idf-agent-ldfc-arch64-dev
+      app: idf-agent-ldfc-arch-c4a
   serviceName: ""
   template:
     metadata:
       creationTimestamp: null
       labels:
-        app: idf-agent-ldfc-arch64-dev
+        app: idf-agent-ldfc-arch-c4a
     spec:
-      nodeSelector:
-        failure-domain.beta.kubernetes.io/zone: us-central1-a
       containers:
       - args:
         - --host=tcp://localhost:2375
@@ -60,11 +58,11 @@ spec:
           timeoutSeconds: 1
         resources:
           limits:
-            cpu: "15"
-            memory: 54Gi
+            cpu: "12"
+            memory: 64Gi
           requests:
-            cpu: "15"
-            memory: 54Gi
+            cpu: "12"
+            memory: 64Gi
         securityContext:
           allowPrivilegeEscalation: true
           privileged: true
@@ -78,7 +76,7 @@ spec:
         - mountPath: /var/lib/docker
           name: docker-graph-storage
         - mountPath: /j
-          name: volume-arm
+          name: volume-aarch
       - command:
         - sh
         - -c
@@ -101,11 +99,11 @@ spec:
         name: docker-gc
         resources:
           limits:
-            cpu: 250m
-            memory: 500Mi
+            cpu: 500m
+            memory: 512Mi
           requests:
-            cpu: 250m
-            memory: 500Mi
+            cpu: 500m
+            memory: 512Mi
         securityContext:
           allowPrivilegeEscalation: true
           privileged: false
@@ -121,9 +119,9 @@ spec:
         - name: DOCKER_HOST
           value: tcp://localhost:2375
         - name: JSWARM_URL
-          value: https://rubin-ci-dev.slac.stanford.edu/
+          value: https://rubin-ci.slac.stanford.edu/
         - name: JSWARM_TUNNEL
-          value: 134.79.23.201:20000
+          value: 134.79.23.234:20000
         - name: JSWARM_MODE
           value: normal
         - name: JSWARM_LABELS
@@ -195,7 +193,7 @@ spec:
               divisor: "0"
               resource: requests.cpu
         - name: K8S_DIND_LIMITS_CPU
-          value:
+          valueFrom:
             resourceFieldRef:
               containerName: dind
               divisor: "0"
@@ -281,10 +279,10 @@ spec:
         terminationMessagePolicy: File
         volumeMounts:
         - mountPath: /j
-          name: volume-arm
+          name: volume-aarch
       dnsPolicy: ClusterFirst
       nodeSelector:
-        cloud.google.com/gke-nodepool: jenkins-workers-multiarch
+        cloud.google.com/gke-nodepool: jenkins-workers-multiarch-c4a
         kubernetes.io/arch: arm64
       restartPolicy: Always
       schedulerName: default-scheduler
@@ -301,15 +299,15 @@ spec:
   updateStrategy:
     type: RollingUpdate
   volumeClaimTemplates:
-    #    - apiVersion: v1
+    - apiVersion: v1
       kind: PersistentVolumeClaim
       metadata:
-        name: volume-arm
+        name: volume-aarch
       spec:
         accessModes:
           - ReadWriteOnce
         resources:
           requests:
-            storage: "1500Gi"
-        storageClassName: arm-volume
+            storage: 1500Gi
+        storageClassName: aarch-volume
         volumeMode: Filesystem
