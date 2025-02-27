@@ -4,7 +4,7 @@ metadata:
   name: idf-agent-ldfc
 spec:
   podManagementPolicy: Parallel
-  replicas: 8
+  replicas: 6
   revisionHistoryLimit: 10
   selector:
     matchLabels:
@@ -54,10 +54,10 @@ spec:
             timeoutSeconds: 1
           resources:
             limits:
-              cpu: "8"
+              cpu: "12"
               memory: 64Gi
             requests:
-              cpu: "8"
+              cpu: "12"
               memory: 64Gi
           securityContext:
             allowPrivilegeEscalation: true
@@ -123,7 +123,7 @@ spec:
             - name: JSWARM_MODE
               value: normal
             - name: JSWARM_LABELS
-              value: docker ldfc linux-64
+              value: ldfc linux-64
             - name: JSWARM_EXECUTORS
               value: "1"
             - name: JSWARM_AGENT_NAME
