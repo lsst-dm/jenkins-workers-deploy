@@ -11,9 +11,37 @@ resource "google_compute_network" "net" {
   internal_ipv6_range                       = null
   mtu                                       = 1460
   network_firewall_policy_enforcement_order = "AFTER_CLASSIC_FIREWALL"
-  network_profile                           = null
   project                                   = "prompt-proto"
   routing_mode                              = "REGIONAL"
+}
+resource "google_compute_subnetwork" "subnet" {
+  name                       = "prompt-proto-sub-1"
+  description                = null
+  external_ipv6_prefix       = null
+  internal_ipv6_prefix       = null
+  ip_cidr_range              = "10.0.0.0/9"
+  ipv6_access_type           = null
+  ipv6_cidr_range            = null
+  network                    = google_compute_network.net.id
+  private_ip_google_access   = true
+  private_ipv6_google_access = "DISABLE_GOOGLE_ACCESS"
+  project                    = "prompt-proto"
+  purpose                    = "PRIVATE"
+  region                     = "us-central1"
+  reserved_internal_range    = null
+  role                       = null
+  stack_type                 = "IPV4_ONLY"
+
+  secondary_ip_range {
+    ip_cidr_range           = "10.228.0.0/20"
+    range_name              = "gke-jenkins-test-services-ed1f94bc"
+    reserved_internal_range = null
+  }
+  secondary_ip_range {
+    ip_cidr_range           = "10.224.0.0/14"
+    range_name              = "gke-jenkins-test-pods-ed1f94bc"
+    reserved_internal_range = null
+  }
 }
 
 resource "google_compute_router" "router" {
@@ -75,4 +103,40 @@ resource "google_compute_router_nat_address" "nat_address" {
   router     = google_compute_router.router.name
   router_nat = google_compute_router_nat.nat.name
   region     = google_compute_router_nat.nat.region
+}
+#resource targetHttpProxies
+
+#resource forwardingrule
+resource "google_compute_global_forwarding_rule" "eups_lsst_codes_forwarding_rule" {
+  name                  = "eups-lsst-codes-forwarding-rule"
+  base_forwarding_rule  = null
+  description           = null
+  ip_address            = "34.160.10.3"
+  ip_protocol           = "TCP"
+  ip_version            = "IPV4"
+  labels                = {}
+  load_balancing_scheme = "EXTERNAL_MANAGED"
+  network               = null
+  network_tier          = "PREMIUM"
+  port_range            = "80-80"
+  project               = "prompt-proto"
+  psc_connection_id     = null
+  psc_connection_status = null
+  source_ip_ranges      = []
+  subnetwork            = null
+  target                = google_compute_target_http_proxy.eups_target_proxy.id
+}
+
+resource "google_compute_target_http_proxy" "eups_target_proxy" {
+  name       = "eups-lsst-codes-target-proxy"
+  project    = "prompt-proto"
+  proxy_bind = false
+  url_map    = google_compute_url_map.default.id
+}
+
+resource "google_compute_url_map" "default" {
+  name            = "eups-lsst-codes"
+  default_service = google_compute_backend_bucket.eups_stack_tarball.id
+  description     = null
+  project         = "prompt-proto"
 }
