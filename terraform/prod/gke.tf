@@ -20,7 +20,7 @@ resource "google_container_cluster" "jenkins_test" {
   network                                  = "projects/prompt-proto/global/networks/prompt-proto-net"
   networking_mode                          = "VPC_NATIVE"
   node_locations                           = []
-  node_version                             = "1.30.9-gke.1127000"
+  node_version                             = "1.30.9-gke.1201000"
   project                                  = "prompt-proto"
   #resource_labels                          = {}
   subnetwork = "projects/prompt-proto/regions/us-central1/subnetworks/prompt-proto-sub-1"
@@ -152,7 +152,7 @@ resource "google_container_cluster" "jenkins_test" {
     node_locations = [
       "us-central1-c",
     ]
-    version = "1.30.9-gke.1127000"
+    version = "1.30.9-gke.1201000"
 
     management {
       auto_repair  = true
@@ -224,7 +224,7 @@ resource "google_container_cluster" "jenkins_test" {
     node_locations = [
       "us-central1-a",
     ]
-    version = "1.30.9-gke.1127000"
+    version = "1.30.9-gke.1201000"
 
     management {
       auto_repair  = true
