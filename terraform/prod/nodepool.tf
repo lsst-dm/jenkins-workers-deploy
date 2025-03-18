@@ -10,7 +10,6 @@ resource "google_container_node_pool" "jenkins_workers_big" {
     "us-central1-c",
   ]
   project = "prompt-proto"
-  version = "1.30.9-gke.1201000"
 
   management {
     auto_repair  = true
@@ -79,7 +78,6 @@ resource "google_container_node_pool" "jenkins_workers_multiarch_c4a" {
     "us-central1-a",
   ]
   project = "prompt-proto"
-  version = "1.30.9-gke.1201000"
 
   management {
     auto_repair  = true
