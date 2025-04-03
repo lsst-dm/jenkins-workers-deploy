@@ -137,6 +137,17 @@ resource "google_compute_target_http_proxy" "eups_target_proxy" {
 resource "google_compute_url_map" "default" {
   name            = "eups-lsst-codes"
   default_service = google_compute_backend_bucket.eups_stack_tarball.id
-  description     = null
+  description     = "Allow for bucket to be exposed to the internet, so that people can download tarballs"
   project         = "prompt-proto"
+  host_rule {
+    hosts = [
+      "*",
+    ]
+    path_matcher = "path-matcher-2"
+  }
+
+  path_matcher {
+    default_service = "https://www.googleapis.com/compute/v1/projects/prompt-proto/global/backendBuckets/eups-stack-tarball"
+    name            = "path-matcher-2"
+  }
 }

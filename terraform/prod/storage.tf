@@ -96,3 +96,9 @@ resource "google_compute_snapshot" "pipelines_disk_w_2022_10" {
     "us-central1",
   ]
 }
+resource "google_compute_global_address" "eups_bucket" {
+  address      = "34.160.10.3"
+  address_type = "EXTERNAL"
+  name         = "eups-bucket-address"
+  project      = "prompt-proto"
+}
