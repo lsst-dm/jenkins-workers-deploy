@@ -31,6 +31,9 @@ resource "google_container_cluster" "jenkins_test" {
     gce_persistent_disk_csi_driver_config {
       enabled = true
     }
+    gcs_fuse_csi_driver_config {
+      enabled = true
+    }
     horizontal_pod_autoscaling {
       disabled = false
     }
