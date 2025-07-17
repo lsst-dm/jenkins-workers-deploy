@@ -1,8 +1,3 @@
-resource "google_service_account" "eups" {
-  account_id = "eups-prod"
-  display_name = "eups-prod"
-  description  = "Owner of production eups.lsst.cloud bucket" 
-}
 
 resource "google_service_account" "eups_dev"{
   account_id = "eups-dev"
@@ -19,3 +14,4 @@ resource "google_service_account" "jenkins_secrets" {
   description  = "Manage secrets for Jenkins"
   display_name = "jenkins-secrets" 
 }
+
