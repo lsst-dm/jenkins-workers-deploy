@@ -8,6 +8,112 @@ resource "google_compute_backend_bucket" "eups_stack_tarball" {
   edge_security_policy    = null
   enable_cdn              = false
 }
+
+#resource backendbucket doxygen-dev
+resource "google_compute_backend_bucket" "doxygen_dev_backend" {
+  name                    = "doxygen-dev-backend"
+  bucket_name             = "doxygen-dev"
+  compression_mode        = null
+  custom_response_headers = []
+  description             = null
+  edge_security_policy    = null
+  enable_cdn              = true
+  cdn_policy {
+    cache_mode        = "CACHE_ALL_STATIC"
+    client_ttl        = 3600
+    default_ttl       = 3600
+    max_ttl           = 86400
+    negative_caching  = true
+    serve_while_stale = 86400
+  }
+}
+
+#resource backendbucket doxygen
+resource "google_compute_backend_bucket" "doxygen_backend" {
+  name                    = "doxygen-backend"
+  bucket_name             = "doxygen"
+  compression_mode        = null
+  custom_response_headers = []
+  description             = null
+  edge_security_policy    = null
+  enable_cdn              = true
+  cdn_policy {
+    cache_mode        = "CACHE_ALL_STATIC"
+    client_ttl        = 3600
+    default_ttl       = 3600
+    max_ttl           = 86400
+    negative_caching  = true
+    serve_while_stale = 86400
+  }
+}
+
+#resource storage bucket doxygen
+resource "google_storage_bucket" "doxygen" {
+  name                        = "doxygen"
+  location                    = "US"
+  default_event_based_hold    = false
+  enable_object_retention     = false
+  force_destroy               = false
+  labels                      = {}
+  project                     = "prompt-proto"
+  public_access_prevention    = "unspecified"
+  requester_pays              = false
+  rpo                         = "DEFAULT"
+  storage_class               = "STANDARD"
+  uniform_bucket_level_access = true
+
+  hierarchical_namespace {
+    enabled = true
+  }
+
+  versioning {
+    enabled = false
+  }
+
+  retention_policy {
+    is_locked        = false
+    retention_period = 0
+  }
+
+  website {
+    main_page_suffix = "index.html"
+  }
+}
+
+#resource storage bucket doxygen-dev
+resource "google_storage_bucket" "doxygen-dev" {
+  name                        = "doxygen-dev"
+  location                    = "US"
+  default_event_based_hold    = false
+  enable_object_retention     = false
+  force_destroy               = false
+  labels                      = {}
+  project                     = "prompt-proto"
+  public_access_prevention    = "unspecified"
+  requester_pays              = false
+  rpo                         = "DEFAULT"
+  storage_class               = "STANDARD"
+  uniform_bucket_level_access = true
+
+  hierarchical_namespace {
+    enabled = true
+  }
+
+  versioning {
+    enabled = false
+  }
+
+  retention_policy {
+    is_locked        = false
+    retention_period = 0
+  }
+
+  website {
+    main_page_suffix = "index.html"
+  }
+
+}
+
 #resource storage bucket eups
 resource "google_storage_bucket" "eups" {
   name                        = "eups"
@@ -33,7 +139,6 @@ resource "google_storage_bucket" "eups" {
   lifecycle_rule {
     action {
       type = "Delete"
-      # (1 unchanged attribute hidden)
     }
     condition {
       age                                     = 0
@@ -48,13 +153,11 @@ resource "google_storage_bucket" "eups" {
       send_days_since_noncurrent_time_if_zero = false
       send_num_newer_versions_if_zero         = false
       with_state                              = "ARCHIVED"
-      # (3 unchanged attributes hidden)
     }
   }
   lifecycle_rule {
     action {
       type = "Delete"
-      # (1 unchanged attribute hidden)
     }
     condition {
       age                                     = 0
@@ -92,6 +195,37 @@ resource "google_storage_bucket" "eups" {
     }
   }
 }
+
+#resource storage bucket eups-dev
+resource "google_storage_bucket" "eups-dev" {
+  name                        = "eups-dev"
+  location                    = "US"
+  default_event_based_hold    = false
+  enable_object_retention     = false
+  force_destroy               = false
+  labels                      = {}
+  project                     = "prompt-proto"
+  public_access_prevention    = "unspecified"
+  requester_pays              = false
+  rpo                         = "DEFAULT"
+  storage_class               = "STANDARD"
+  uniform_bucket_level_access = true
+
+  hierarchical_namespace {
+    enabled = true
+  }
+
+  versioning {
+    enabled = false
+  }
+
+  retention_policy {
+    is_locked        = false
+    retention_period = 0
+  }
+
+}
+
 resource "google_storage_bucket" "eups_lsstsw_cache" {
   name     = "eups-lsstsw-cache"
   location = "US"
@@ -181,6 +315,7 @@ resource "google_storage_bucket" "eups_prod" {
     retention_duration_seconds = 2678400
   }
 }
+
 #resource storage bucket eups-backup
 resource "google_storage_bucket" "eups_backup" {
   name                        = "eups-backup"
