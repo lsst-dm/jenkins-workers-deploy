@@ -1,14 +1,14 @@
-# google_container_node_pool.jenkins_workers_big:
-resource "google_container_node_pool" "jenkins_workers_big" {
-  cluster            = "jenkins-test"
-  initial_node_count = 0
+# google_container_node_pool.jenkins_controls_standard:
+resource "google_container_node_pool" "jenkins_controls_standard" {
+  cluster            = google_container_cluster.jenkins_test.name
+  initial_node_count = 3
   autoscaling {
     min_node_count = 0
-    max_node_count = 8
+    max_node_count = 3
   }
-  location           = "us-central1-c"
+  location           = google_container_cluster.jenkins_test.location
   max_pods_per_node  = 110
-  name               = "jenkins-workers-big"
+  name               = "jenkins-controls-standard"
   node_count         = 6
   node_locations = [
     "us-central1-c",
@@ -24,18 +24,17 @@ resource "google_container_node_pool" "jenkins_workers_big" {
     create_pod_range     = false
     enable_private_nodes = true
     pod_ipv4_cidr_block  = "10.224.0.0/14"
-    pod_range            = "gke-jenkins-test-pods-ed1f94bc"
   }
 
   node_config {
-    disk_size_gb                = 300
-    disk_type                   = "pd-standard"
+    disk_size_gb                = 100
+    disk_type                   = "pd-balanced"
     enable_confidential_storage = false
     image_type                  = "COS_CONTAINERD"
     labels                      = {}
     local_ssd_count             = 0
     logging_variant             = "DEFAULT"
-    machine_type                = "n2-highmem-32"
+    machine_type                = "n2-standard-4"
     metadata = {
       "disable-legacy-endpoints" = "true"
     }
@@ -73,8 +72,8 @@ resource "google_container_node_pool" "jenkins_workers_big" {
 
 # google_container_node_pool.jenkins_workers_multiarch_c4d:
 resource "google_container_node_pool" "jenkins_workers_c4d" {
-  cluster            = "jenkins-test"
-  location           = "us-central1-c"
+  cluster            = google_container_cluster.jenkins_test.name
+  location           = google_container_cluster.jenkins_test.location
   max_pods_per_node  = 110
   name               = "jenkins-workers-c4d"
   node_count         = 6
@@ -85,6 +84,7 @@ resource "google_container_node_pool" "jenkins_workers_c4d" {
   }
   node_locations = [
     "us-central1-c",
+    "us-central1-a",
   ]
   project = "prompt-proto"
 
@@ -97,7 +97,6 @@ resource "google_container_node_pool" "jenkins_workers_c4d" {
     create_pod_range     = false
     enable_private_nodes = true
     #pod_ipv4_cidr_block  = "10.224.0.0/14"
-    pod_range = "gke-jenkins-test-pods-ed1f94bc"
   }
 
   node_config {
@@ -105,7 +104,9 @@ resource "google_container_node_pool" "jenkins_workers_c4d" {
     disk_type                   = "hyperdisk-balanced"
     enable_confidential_storage = false
     image_type                  = "COS_CONTAINERD"
-    labels                      = {}
+    labels = {
+      "worktype" = "workers"
+    }
     local_ssd_count             = 0
     logging_variant             = "DEFAULT"
     machine_type                = "c4d-highmem-32"
@@ -147,14 +148,14 @@ resource "google_container_node_pool" "jenkins_workers_c4d" {
 
 # google_container_node_pool.jenkins_workers_multiarch_c4a:
 resource "google_container_node_pool" "jenkins_workers_multiarch_c4a" {
-  cluster            = "jenkins-test"
-  location           = "us-central1-c"
+  cluster            = google_container_cluster.jenkins_test.name
+  location           = google_container_cluster.jenkins_test.location
   max_pods_per_node  = 110
   name               = "jenkins-workers-multiarch-c4a"
   initial_node_count = 0
   autoscaling {
     min_node_count = 0
-    max_node_count = 6
+    max_node_count = 8
   }
   node_locations = [
     "us-central1-c",
@@ -170,7 +171,6 @@ resource "google_container_node_pool" "jenkins_workers_multiarch_c4a" {
     create_pod_range     = false
     enable_private_nodes = true
     #pod_ipv4_cidr_block  = "10.224.0.0/14"
-    pod_range = "gke-jenkins-test-pods-ed1f94bc"
   }
 
   node_config {
@@ -217,19 +217,16 @@ resource "google_container_node_pool" "jenkins_workers_multiarch_c4a" {
   }
 }
 
-# google_container_node_pool.jenkins_workers_multiarch_snowflake:
-resource "google_container_node_pool" "jenkins_workers_multiarch_snowflake" {
-  cluster            = "jenkins-test"
-  location           = "us-central1-c"
-  max_pods_per_node  = 110
-  name               = "jenkins-workers-multiarch-c4a"
+# google_container_node_pool.load_test_deafult_pool
+resource "google_container_node_pool" "default_pool" {
+  cluster            = google_container_cluster.load_test.name
   initial_node_count = 0
-  autoscaling {
-    min_node_count = 0
-    max_node_count = 3
-  }
+  location           = google_container_cluster.load_test.location
+  max_pods_per_node  = 110
+  name               = "default-pool"
+  node_count         = 0
   node_locations = [
-    "us-central1-c",
+    "us-west2-c",
   ]
   project = "prompt-proto"
 
@@ -241,26 +238,16 @@ resource "google_container_node_pool" "jenkins_workers_multiarch_snowflake" {
   network_config {
     create_pod_range     = false
     enable_private_nodes = true
-    #pod_ipv4_cidr_block  = "10.224.0.0/14"
-    pod_range = "gke-jenkins-test-pods-ed1f94bc"
+    pod_ipv4_cidr_block  = "10.224.0.0/14"
   }
 
   node_config {
-    disk_size_gb                = 300
-    disk_type                   = "hyperdisk-balanced"
-    enable_confidential_storage = false
+    disk_size_gb                = 100
+    disk_type                   = "pd-balanced"
     image_type                  = "COS_CONTAINERD"
-    labels                      = {
-      workload = "snowflake"
-    }
-    taint                       {
-      effect = "NO_EXECUTE"
-      key    = "workload"
-      value  = "snowflake"
-    }
-    local_ssd_count             = 0
+    labels                      = {}
     logging_variant             = "DEFAULT"
-    machine_type                = "c4a-highmem-32"
+    machine_type                = "e2-medium"
     metadata = {
       "disable-legacy-endpoints" = "true"
     }
@@ -284,9 +271,6 @@ resource "google_container_node_pool" "jenkins_workers_multiarch_snowflake" {
       enable_secure_boot          = true
     }
 
-    workload_metadata_config {
-      mode = "GKE_METADATA"
-    }
   }
 
   upgrade_settings {
@@ -295,4 +279,3 @@ resource "google_container_node_pool" "jenkins_workers_multiarch_snowflake" {
     strategy        = "SURGE"
   }
 }
-

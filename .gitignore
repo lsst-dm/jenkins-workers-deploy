@@ -11,3 +11,4 @@
 *.tfvars
 *.tfvars.json
 .terraform.lock.hcl
+.tflint.hcl
