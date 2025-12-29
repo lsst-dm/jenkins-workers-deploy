@@ -32,7 +32,7 @@ resource "google_compute_network" "load_test_net" {
   routing_mode                              = "REGIONAL"
 }
 
-resource "google_compute_subnetwork" "loat_test_subnet" {
+resource "google_compute_subnetwork" "load_test_subnet" {
   name                       = "load-test-net-1"
   description                = null
   external_ipv6_prefix       = null
@@ -53,7 +53,7 @@ resource "google_compute_subnetwork" "loat_test_subnet" {
   secondary_ip_range {
     ip_cidr_range           = "10.108.0.0/14"
     range_name              = "gke-load-test-pods-e809bf45"
-    reserved_internal_range = null
+    reserved_internal_range = "https://networkconnectivity.googleapis.com/v1/projects/prompt-proto/locations/global/internalRanges/gke-load-test-pods-e809bf45"
   }
 }
 
@@ -88,7 +88,7 @@ resource "google_compute_subnetwork" "subnet" {
 }
 
 resource "google_compute_router" "router" {
-  name = "prompt-router"
+  name                          = "prompt-router"
   network                       = google_compute_network.net.id
   description                   = null
   encrypted_interconnect_router = false
@@ -97,7 +97,7 @@ resource "google_compute_router" "router" {
 }
 
 resource "google_compute_router" "load_test_router" {
-  name = "load-test-router"
+  name                          = "load-test-router"
   network                       = google_compute_network.load_test_net.id
   description                   = null
   encrypted_interconnect_router = false
@@ -151,7 +151,7 @@ resource "google_compute_router_nat" "load_test_nat" {
   ]
   icmp_idle_timeout_sec  = 30
   max_ports_per_vm       = 0
-  min_ports_per_vm       = 64
+  min_ports_per_vm       = 0
   nat_ip_allocate_option = "MANUAL_ONLY"
   nat_ips = [
     "https://www.googleapis.com/compute/v1/projects/prompt-proto/regions/us-west2/addresses/load-test-exit",
@@ -264,22 +264,28 @@ resource "google_compute_url_map" "doxygen_dev_url_map" {
   description     = "Allow for bucket to be exposed to the internet, so that people can access doxygen-dev"
   project         = "prompt-proto"
   host_rule {
-    hosts = ["doxygen-dev.lsst.cloud"]
-    path_matcher = "doxygen-dev-paths"
+    hosts        = ["doxygen-dev.lsst.cloud"]
+    path_matcher = "path-matcher-1"
   }
 
   path_matcher {
     default_service = google_compute_backend_bucket.doxygen_dev_backend.id
-    name            = "doxygen-dev-paths"
+    name            = "path-matcher-1"
     path_rule {
       paths = ["/"]
+      url_redirect {
+        https_redirect         = true
+        path_redirect          = "/index.html"
+        redirect_response_code = "MOVED_PERMANENTLY_DEFAULT"
+        strip_query            = false
+      }
     }
   }
 }
 
 resource "google_compute_global_forwarding_rule" "doxygen_dev_forwarding_rule" {
   name                  = "doxygen-dev-forwarding-rule"
-  load_balancing_scheme = "EXTERNAL_MANAGED"
+  load_balancing_scheme = "EXTERNAL"
   target                = google_compute_target_https_proxy.doxygen_dev_https.id
   port_range            = "443"
   ip_protocol           = "TCP"
@@ -298,7 +304,7 @@ resource "google_compute_target_https_proxy" "doxygen_dev_https" {
   name                        = "doxygen-dev-https"
   url_map                     = google_compute_url_map.doxygen_dev_url_map.id
   ssl_certificates            = [google_compute_managed_ssl_certificate.doxygen_dev_cert.id]
-  http_keep_alive_timeout_sec = 610
+  http_keep_alive_timeout_sec = 0
 }
 
 #doxygen
@@ -308,20 +314,11 @@ resource "google_compute_url_map" "doxygen_url_map" {
   default_service = google_compute_backend_bucket.doxygen_backend.id
   description     = "Allow for bucket to be exposed to the internet, so that people can access doxygen"
   project         = "prompt-proto"
-  host_rule {
-    hosts = ["doxygen.lsst.cloud"]
-    path_matcher = "doxygen-paths"
-  }
-
-  path_matcher {
-    default_service = google_compute_backend_bucket.doxygen_backend.id
-    name            = "doxygen-paths"
-  }
 }
 
 resource "google_compute_global_forwarding_rule" "doxygen_forwarding_rule" {
   name                  = "doxygen-forwarding-rule"
-  load_balancing_scheme = "EXTERNAL_MANAGED"
+  load_balancing_scheme = "EXTERNAL"
   target                = google_compute_target_https_proxy.doxygen_https.id
   port_range            = "443"
   ip_protocol           = "TCP"
@@ -340,5 +337,5 @@ resource "google_compute_target_https_proxy" "doxygen_https" {
   name                        = "doxygen-https"
   url_map                     = google_compute_url_map.doxygen_url_map.id
   ssl_certificates            = [google_compute_managed_ssl_certificate.doxygen_cert.id]
-  http_keep_alive_timeout_sec = 610
+  http_keep_alive_timeout_sec = 0
 }
