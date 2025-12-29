@@ -12,7 +12,7 @@ resource "google_container_cluster" "jenkins_test" {
   enable_multi_networking                  = false
   enable_shielded_nodes                    = true
   enable_tpu                               = false
-  initial_node_count                       = 1
+  initial_node_count                       = 0
   location                                 = "us-central1-c"
   logging_service                          = "logging.googleapis.com/kubernetes"
   monitoring_service                       = "monitoring.googleapis.com/kubernetes"
@@ -21,10 +21,11 @@ resource "google_container_cluster" "jenkins_test" {
   networking_mode                          = "VPC_NATIVE"
   node_locations                           = []
   project                                  = "prompt-proto"
-  remove_default_node_pool                 = true
   #resource_labels                          = {}
   subnetwork = "projects/prompt-proto/regions/us-central1/subnetworks/prompt-proto-sub-1"
-
+  node_pool_auto_config {
+    resource_manager_tags = {}
+  }
   addons_config {
     dns_cache_config {
       enabled = false
@@ -107,9 +108,6 @@ resource "google_container_cluster" "jenkins_test" {
     provider = "PROVIDER_UNSPECIFIED"
   }
 
-  node_pool_auto_config {
-    resource_manager_tags = {}
-  }
 
   node_pool_defaults {
     node_config_defaults {
@@ -156,25 +154,24 @@ resource "google_container_cluster" "jenkins_test" {
 
 # google_container_cluster.load_test:
 resource "google_container_cluster" "load_test" {
-  cluster_ipv4_cidr                        = "10.108.0.0/14"
-  datapath_provider                        = "LEGACY_DATAPATH"
-  default_max_pods_per_node                = 110
-  deletion_protection                      = true
-  enable_intranode_visibility              = false
-  enable_kubernetes_alpha                  = false
-  enable_legacy_abac                       = false
-  enable_multi_networking                  = false
-  enable_shielded_nodes                    = true
-  initial_node_count                       = 1
-  location                                 = "us-west2-c"
-  logging_service                          = "logging.googleapis.com/kubernetes"
-  monitoring_service                       = "monitoring.googleapis.com/kubernetes"
-  name                                     = "load-test"
-  network                                  = "projects/prompt-proto/global/networks/load-test-net"
-  networking_mode                          = "VPC_NATIVE"
-  node_locations                           = []
-  project                                  = "prompt-proto"
-  remove_default_node_pool                 = true
+  cluster_ipv4_cidr           = "10.108.0.0/14"
+  datapath_provider           = "LEGACY_DATAPATH"
+  default_max_pods_per_node   = 110
+  deletion_protection         = true
+  enable_intranode_visibility = false
+  enable_kubernetes_alpha     = false
+  enable_legacy_abac          = false
+  enable_multi_networking     = false
+  enable_shielded_nodes       = true
+  initial_node_count          = 0
+  location                    = "us-west2-c"
+  logging_service             = "logging.googleapis.com/kubernetes"
+  monitoring_service          = "monitoring.googleapis.com/kubernetes"
+  name                        = "load-test"
+  network                     = "projects/prompt-proto/global/networks/load-test-net"
+  networking_mode             = "VPC_NATIVE"
+  node_locations              = []
+  project                     = "prompt-proto"
   #resource_labels                          = {}
   subnetwork = "projects/prompt-proto/regions/us-west2/subnetworks/load-test-net-1"
 

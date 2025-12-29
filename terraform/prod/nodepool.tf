@@ -6,10 +6,10 @@ resource "google_container_node_pool" "jenkins_controls_standard" {
     min_node_count = 0
     max_node_count = 3
   }
-  location           = google_container_cluster.jenkins_test.location
-  max_pods_per_node  = 110
-  name               = "jenkins-controls-standard"
-  node_count         = 6
+  location          = google_container_cluster.jenkins_test.location
+  max_pods_per_node = 110
+  name              = "jenkins-controls-standard"
+  node_count        = 2
   node_locations = [
     "us-central1-c",
   ]
@@ -76,11 +76,11 @@ resource "google_container_node_pool" "jenkins_workers_c4d" {
   location           = google_container_cluster.jenkins_test.location
   max_pods_per_node  = 110
   name               = "jenkins-workers-c4d"
-  node_count         = 6
-  initial_node_count = 0
+  node_count         = 0
+  initial_node_count = 4
   autoscaling {
-    min_node_count = 0
-    max_node_count = 8
+    min_node_count       = 0
+    total_max_node_count = 8
   }
   node_locations = [
     "us-central1-c",
@@ -107,9 +107,9 @@ resource "google_container_node_pool" "jenkins_workers_c4d" {
     labels = {
       "worktype" = "workers"
     }
-    local_ssd_count             = 0
-    logging_variant             = "DEFAULT"
-    machine_type                = "c4d-highmem-32"
+    local_ssd_count = 0
+    logging_variant = "DEFAULT"
+    machine_type    = "c4d-highmem-32"
     metadata = {
       "disable-legacy-endpoints" = "true"
     }
@@ -121,8 +121,10 @@ resource "google_container_node_pool" "jenkins_workers_c4d" {
       "https://www.googleapis.com/auth/servicecontrol",
       "https://www.googleapis.com/auth/trace.append",
     ]
-    preemptible           = false
-    resource_labels       = {}
+    preemptible = false
+    resource_labels = {
+      "worktype" = "workers"
+    }
     resource_manager_tags = {}
     service_account       = "default"
     spot                  = false
@@ -152,7 +154,7 @@ resource "google_container_node_pool" "jenkins_workers_multiarch_c4a" {
   location           = google_container_cluster.jenkins_test.location
   max_pods_per_node  = 110
   name               = "jenkins-workers-multiarch-c4a"
-  initial_node_count = 0
+  initial_node_count = 9
   autoscaling {
     min_node_count = 0
     max_node_count = 8
@@ -178,10 +180,12 @@ resource "google_container_node_pool" "jenkins_workers_multiarch_c4a" {
     disk_type                   = "hyperdisk-balanced"
     enable_confidential_storage = false
     image_type                  = "COS_CONTAINERD"
-    labels                      = {}
-    local_ssd_count             = 0
-    logging_variant             = "DEFAULT"
-    machine_type                = "c4a-highmem-32"
+    labels = {
+      "workload" = "workers"
+    }
+    local_ssd_count = 0
+    logging_variant = "DEFAULT"
+    machine_type    = "c4a-highmem-32"
     metadata = {
       "disable-legacy-endpoints" = "true"
     }
@@ -218,7 +222,7 @@ resource "google_container_node_pool" "jenkins_workers_multiarch_c4a" {
 }
 
 # google_container_node_pool.load_test_deafult_pool
-resource "google_container_node_pool" "default_pool" {
+resource "google_container_node_pool" "load_test" {
   cluster            = google_container_cluster.load_test.name
   initial_node_count = 0
   location           = google_container_cluster.load_test.location
@@ -237,19 +241,23 @@ resource "google_container_node_pool" "default_pool" {
 
   network_config {
     create_pod_range     = false
-    enable_private_nodes = true
-    pod_ipv4_cidr_block  = "10.224.0.0/14"
+    enable_private_nodes = false
+    pod_ipv4_cidr_block  = "10.108.0.0/14"
   }
 
   node_config {
-    disk_size_gb                = 100
-    disk_type                   = "pd-balanced"
-    image_type                  = "COS_CONTAINERD"
-    labels                      = {}
-    logging_variant             = "DEFAULT"
-    machine_type                = "e2-medium"
+    disk_size_gb    = 100
+    disk_type       = "pd-balanced"
+    image_type      = "COS_CONTAINERD"
+    labels          = {}
+    logging_variant = "DEFAULT"
+    machine_type    = "e2-medium"
     metadata = {
       "disable-legacy-endpoints" = "true"
+    }
+    advanced_machine_features {
+      enable_nested_virtualization = false
+      threads_per_core             = 0
     }
     oauth_scopes = [
       "https://www.googleapis.com/auth/devstorage.read_only",
@@ -271,6 +279,9 @@ resource "google_container_node_pool" "default_pool" {
       enable_secure_boot          = true
     }
 
+  }
+  queued_provisioning {
+    enabled = false
   }
 
   upgrade_settings {

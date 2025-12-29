@@ -25,6 +25,7 @@ resource "google_compute_backend_bucket" "doxygen_dev_backend" {
     max_ttl           = 86400
     negative_caching  = true
     serve_while_stale = 86400
+    request_coalescing = true
   }
 }
 
@@ -44,6 +45,7 @@ resource "google_compute_backend_bucket" "doxygen_backend" {
     max_ttl           = 86400
     negative_caching  = true
     serve_while_stale = 86400
+    request_coalescing = true
   }
 }
 
@@ -56,7 +58,6 @@ resource "google_storage_bucket" "doxygen" {
   force_destroy               = false
   labels                      = {}
   project                     = "prompt-proto"
-  public_access_prevention    = "unspecified"
   requester_pays              = false
   rpo                         = "DEFAULT"
   storage_class               = "STANDARD"
@@ -64,15 +65,6 @@ resource "google_storage_bucket" "doxygen" {
 
   hierarchical_namespace {
     enabled = true
-  }
-
-  versioning {
-    enabled = false
-  }
-
-  retention_policy {
-    is_locked        = false
-    retention_period = 0
   }
 
   website {
@@ -81,7 +73,7 @@ resource "google_storage_bucket" "doxygen" {
 }
 
 #resource storage bucket doxygen-dev
-resource "google_storage_bucket" "doxygen-dev" {
+resource "google_storage_bucket" "doxygen_dev" {
   name                        = "doxygen-dev"
   location                    = "US"
   default_event_based_hold    = false
@@ -89,7 +81,6 @@ resource "google_storage_bucket" "doxygen-dev" {
   force_destroy               = false
   labels                      = {}
   project                     = "prompt-proto"
-  public_access_prevention    = "unspecified"
   requester_pays              = false
   rpo                         = "DEFAULT"
   storage_class               = "STANDARD"
@@ -98,16 +89,6 @@ resource "google_storage_bucket" "doxygen-dev" {
   hierarchical_namespace {
     enabled = true
   }
-
-  versioning {
-    enabled = false
-  }
-
-  retention_policy {
-    is_locked        = false
-    retention_period = 0
-  }
-
   website {
     main_page_suffix = "index.html"
   }
@@ -197,7 +178,7 @@ resource "google_storage_bucket" "eups" {
 }
 
 #resource storage bucket eups-dev
-resource "google_storage_bucket" "eups-dev" {
+resource "google_storage_bucket" "eups_dev" {
   name                        = "eups-dev"
   location                    = "US"
   default_event_based_hold    = false
@@ -205,7 +186,6 @@ resource "google_storage_bucket" "eups-dev" {
   force_destroy               = false
   labels                      = {}
   project                     = "prompt-proto"
-  public_access_prevention    = "unspecified"
   requester_pays              = false
   rpo                         = "DEFAULT"
   storage_class               = "STANDARD"
@@ -214,16 +194,6 @@ resource "google_storage_bucket" "eups-dev" {
   hierarchical_namespace {
     enabled = true
   }
-
-  versioning {
-    enabled = false
-  }
-
-  retention_policy {
-    is_locked        = false
-    retention_period = 0
-  }
-
 }
 
 resource "google_storage_bucket" "eups_lsstsw_cache" {
@@ -258,7 +228,7 @@ resource "google_storage_bucket" "jenkins_tf_state_prod" {
       type = "Delete"
     }
     condition {
-      age                                     = -1
+      age                                     = 0
       days_since_custom_time                  = 0
       days_since_noncurrent_time              = 0
       matches_prefix                          = []
@@ -328,7 +298,6 @@ resource "google_storage_bucket" "eups_backup" {
   requester_pays              = false
   rpo                         = "DEFAULT"
   uniform_bucket_level_access = true
-
   hierarchical_namespace {
     enabled = false
   }
@@ -453,12 +422,24 @@ resource "google_compute_global_address" "eups_bucket" {
 
 resource "google_storage_transfer_job" "eups_backup_job" {
   description = " Backup eups prod bucket"
+  logging_config {
+    enable_on_prem_gcs_transfer_logs = false
+    log_action_states                = []
+    log_actions                      = []
+  }
   transfer_spec {
     transfer_options {
       delete_objects_from_source_after_transfer  = false
       delete_objects_unique_in_sink              = false
       overwrite_objects_already_existing_in_sink = false
       overwrite_when                             = "DIFFERENT"
+      metadata_options {
+        acl            = "ACL_DESTINATION_BUCKET_DEFAULT"
+        kms_key        = "KMS_KEY_DESTINATION_BUCKET_DEFAULT"
+        storage_class  = "STORAGE_CLASS_DESTINATION_BUCKET_DEFAULT"
+        temporary_hold = "TEMPORARY_HOLD_PRESERVE"
+        time_created   = "TIME_CREATED_SKIP"
+      }
     }
     gcs_data_source {
       bucket_name = google_storage_bucket.eups_prod.name
@@ -484,6 +465,4 @@ resource "google_storage_transfer_job" "eups_backup_job" {
       seconds = 0
     }
   }
-
-
 }
