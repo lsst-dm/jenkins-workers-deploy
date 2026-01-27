@@ -194,6 +194,20 @@ resource "google_compute_address" "load_test_address" {
   subnetwork    = null
 }
 
+# google_compute_global_address.atlantis:
+resource "google_compute_global_address" "atlantis" {
+  name               = "atlantis"
+  address            = "34.111.195.59"
+  address_type       = "EXTERNAL"
+  description        = "Static external IP for deploying atlantis."
+  labels             = {}
+  network            = null
+  ip_version         = "IPV4"
+  prefix_length      = 0
+  project            = "prompt-proto"
+  purpose            = null
+}
+
 resource "google_compute_router_nat_address" "nat_address" {
   nat_ips    = google_compute_address.address[*].self_link
   router     = google_compute_router.router.name
