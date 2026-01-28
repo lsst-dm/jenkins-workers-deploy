@@ -15,48 +15,6 @@ resource "google_compute_network" "net" {
   routing_mode                              = "REGIONAL"
 }
 
-resource "google_compute_network" "load_test_net" {
-  name                                      = "load-test-net"
-  auto_create_subnetworks                   = false
-  bgp_always_compare_med                    = false
-  bgp_best_path_selection_mode              = "LEGACY"
-  bgp_inter_region_cost                     = null
-  delete_default_routes_on_create           = false
-  description                               = null
-  enable_ula_internal_ipv6                  = false
-  gateway_ipv4                              = null
-  internal_ipv6_range                       = null
-  mtu                                       = 1460
-  network_firewall_policy_enforcement_order = "AFTER_CLASSIC_FIREWALL"
-  project                                   = "prompt-proto"
-  routing_mode                              = "REGIONAL"
-}
-
-resource "google_compute_subnetwork" "load_test_subnet" {
-  name                       = "load-test-net-1"
-  description                = null
-  external_ipv6_prefix       = null
-  internal_ipv6_prefix       = null
-  ip_cidr_range              = "10.0.0.0/24"
-  ipv6_access_type           = null
-  ipv6_cidr_range            = null
-  network                    = google_compute_network.load_test_net.id
-  private_ip_google_access   = true
-  private_ipv6_google_access = "DISABLE_GOOGLE_ACCESS"
-  project                    = "prompt-proto"
-  purpose                    = "PRIVATE"
-  region                     = "us-west2"
-  reserved_internal_range    = null
-  role                       = null
-  stack_type                 = "IPV4_ONLY"
-
-  secondary_ip_range {
-    ip_cidr_range           = "10.108.0.0/14"
-    range_name              = "gke-load-test-pods-e809bf45"
-    reserved_internal_range = "https://networkconnectivity.googleapis.com/v1/projects/prompt-proto/locations/global/internalRanges/gke-load-test-pods-e809bf45"
-  }
-}
-
 resource "google_compute_subnetwork" "subnet" {
   name                       = "prompt-proto-sub-1"
   description                = null
@@ -96,16 +54,6 @@ resource "google_compute_router" "router" {
   region                        = "us-central1"
 }
 
-resource "google_compute_router" "load_test_router" {
-  name                          = "load-test-router"
-  network                       = google_compute_network.load_test_net.id
-  description                   = null
-  encrypted_interconnect_router = false
-  project                       = "prompt-proto"
-  region                        = "us-west2"
-}
-
-
 resource "google_compute_router_nat" "nat" {
   name                                = "prompt-external"
   router                              = google_compute_router.router.name
@@ -137,37 +85,6 @@ resource "google_compute_router_nat" "nat" {
   }
 }
 
-resource "google_compute_router_nat" "load_test_nat" {
-  name                                = "load-test-nat"
-  router                              = google_compute_router.load_test_router.name
-  region                              = google_compute_router.load_test_router.region
-  source_subnetwork_ip_ranges_to_nat  = "ALL_SUBNETWORKS_ALL_IP_RANGES"
-  auto_network_tier                   = null
-  drain_nat_ips                       = []
-  enable_dynamic_port_allocation      = false
-  enable_endpoint_independent_mapping = false
-  endpoint_types = [
-    "ENDPOINT_TYPE_VM",
-  ]
-  icmp_idle_timeout_sec  = 30
-  max_ports_per_vm       = 0
-  min_ports_per_vm       = 0
-  nat_ip_allocate_option = "MANUAL_ONLY"
-  nat_ips = [
-    "https://www.googleapis.com/compute/v1/projects/prompt-proto/regions/us-west2/addresses/load-test-exit",
-  ]
-  project                          = "prompt-proto"
-  tcp_established_idle_timeout_sec = 1200
-  tcp_time_wait_timeout_sec        = 120
-  tcp_transitory_idle_timeout_sec  = 30
-  udp_idle_timeout_sec             = 30
-
-  log_config {
-    enable = false
-    filter = "ALL"
-  }
-}
-
 resource "google_compute_address" "address" {
   name          = "nat-exit-1"
   address       = "35.222.133.45"
@@ -181,20 +98,6 @@ resource "google_compute_address" "address" {
   subnetwork    = null
 }
 
-resource "google_compute_address" "load_test_address" {
-  name          = "load-test-exit"
-  address       = "34.102.114.15"
-  address_type  = "EXTERNAL"
-  labels        = {}
-  network_tier  = "PREMIUM"
-  prefix_length = 0
-  project       = "prompt-proto"
-  purpose       = null
-  region        = "us-west2"
-  subnetwork    = null
-}
-
-# google_compute_global_address.atlantis:
 resource "google_compute_global_address" "atlantis" {
   name               = "atlantis"
   address            = "34.111.195.59"
@@ -213,13 +116,6 @@ resource "google_compute_router_nat_address" "nat_address" {
   router     = google_compute_router.router.name
   router_nat = google_compute_router_nat.nat.name
   region     = google_compute_router_nat.nat.region
-}
-
-resource "google_compute_router_nat_address" "load_test_nat_address" {
-  nat_ips    = google_compute_address.load_test_address[*].self_link
-  router     = google_compute_router.load_test_router.name
-  router_nat = google_compute_router_nat.load_test_nat.name
-  region     = google_compute_router_nat.load_test_nat.region
 }
 
 #resource targetHttpProxies
