@@ -111,6 +111,43 @@ resource "google_compute_global_address" "atlantis" {
   purpose            = null
 }
 
+resource "google_compute_global_address" "vault-external" {
+  name               = "vault-external"    
+  address            = "34.110.184.84"
+  address_type       = "EXTERNAL"
+  ip_version         = "IPV4"
+  labels             = {}
+  network            = null
+  prefix_length      = 0
+  project            = "prompt-proto"
+  purpose            = null
+}
+
+resource "google_compute_global_address" "jenkins" {
+  name               = "jenkins"
+  address            = "34.8.191.153"
+  address_type       = "EXTERNAL"
+  ip_version         = "IPV4"
+  labels             = {}
+  network            = null
+  prefix_length      = 0
+  project            = "prompt-proto"
+  purpose            = null
+}
+
+resource "google_compute_global_address" "jenkins-dev" {
+  name               = "jenkins-dev"
+  address            = "34.49.198.194"
+  address_type       = "EXTERNAL"
+  description        = "External IP for dev jenkins."
+  ip_version         = "IPV4"
+  labels             = {}
+  network            = null
+  prefix_length      = 0
+  project            = "prompt-proto"
+  purpose            = null
+}
+
 resource "google_compute_router_nat_address" "nat_address" {
   nat_ips    = google_compute_address.address[*].self_link
   router     = google_compute_router.router.name
