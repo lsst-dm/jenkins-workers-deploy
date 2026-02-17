@@ -220,3 +220,76 @@ resource "google_container_node_pool" "jenkins_workers_multiarch_c4a" {
     strategy        = "SURGE"
   }
 }
+
+# google_container_node_pool.jenkins_workers_standard:
+resource "google_container_node_pool" "jenkins_controls_standard_aarch64" {
+  cluster            = google_container_cluster.jenkins_test.name
+  location           = google_container_cluster.jenkins_test.location
+  max_pods_per_node  = 110
+  name               = "jenkins-controls-standard-aarch"
+  initial_node_count = 1
+  autoscaling {
+    min_node_count = 1
+    max_node_count = 2
+  }
+  node_locations = [
+    "us-central1-c",
+  ]
+  project = "prompt-proto"
+
+  management {
+    auto_repair  = true
+    auto_upgrade = true
+  }
+
+  network_config {
+    create_pod_range     = false
+    enable_private_nodes = true
+    #pod_ipv4_cidr_block  = "10.224.0.0/14"
+  }
+
+  node_config {
+    disk_size_gb                = 300
+    disk_type                   = "pd-standard"
+    enable_confidential_storage = false
+    image_type                  = "COS_CONTAINERD"
+    labels = {
+      "workload" = "workers"
+    }
+    local_ssd_count = 0
+    logging_variant = "DEFAULT"
+    machine_type    = "t2a-standard-4"
+    metadata = {
+      "disable-legacy-endpoints" = "true"
+    }
+    oauth_scopes = [
+      "https://www.googleapis.com/auth/devstorage.read_only",
+      "https://www.googleapis.com/auth/logging.write",
+      "https://www.googleapis.com/auth/monitoring",
+      "https://www.googleapis.com/auth/service.management.readonly",
+      "https://www.googleapis.com/auth/servicecontrol",
+      "https://www.googleapis.com/auth/trace.append",
+    ]
+    preemptible           = false
+    resource_labels       = {}
+    resource_manager_tags = {}
+    service_account       = "default"
+    spot                  = false
+    tags                  = []
+
+    shielded_instance_config {
+      enable_integrity_monitoring = true
+      enable_secure_boot          = true
+    }
+
+    workload_metadata_config {
+      mode = "GKE_METADATA"
+    }
+  }
+
+  upgrade_settings {
+    max_surge       = 1
+    max_unavailable = 0
+    strategy        = "SURGE"
+  }
+}
