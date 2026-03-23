@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: manager
+  namespace: jenkins
+spec:
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Retain
+    whenScaled: Retain
+  podManagementPolicy: Parallel
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: manager
+  serviceName: ""
+  template:
+    metadata:
+      labels:
+        app: manager
+    spec:
+      containers:
+      - env:
+        - name: DOCKER_HOST
+          value: tcp://localhost:2375
+        - name: JENKINS_URL
+          value: http://jenkins.jenkins.svc.cluster.local:8080
+        - name: JENKINS_TUNNEL
+          value: jenkins-agent.jenkins.svc.cluster.local:20000
+        - name: JENKINS_AGENT_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: JENKINS_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: jenkins-secret
+              name: manager-secret
+        image: jenkins/inbound-agent:jdk17
+        imagePullPolicy: IfNotPresent
+        name: jnlp
+        resources:
+          limits:
+            cpu: "1"
+            memory: 2Gi
+          requests:
+            cpu: "1"
+            memory: 2Gi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        tty: true
+        volumeMounts:
+        - mountPath: /var/lib/docker
+          name: docker-graph-storage
+        - mountPath: /j
+          name: ws-manager-gke
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        cloud.google.com/gke-nodepool: jenkins-controls-standard
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        fsGroup: 4085
+        runAsGroup: 0
+        runAsNonRoot: false
+        runAsUser: 0
+      shareProcessNamespace: false
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir: {}
+        name: docker-graph-storage
+      - name: ws-manager-gke
+        persistentVolumeClaim:
+          claimName: manager-pvc
+  updateStrategy:
+    type: RollingUpdate

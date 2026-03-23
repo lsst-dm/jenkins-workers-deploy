@@ -1,16 +1,23 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
+  annotations:
   name: snowflake
+  namespace: jenkins
 spec:
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Retain
+    whenScaled: Retain
   podManagementPolicy: Parallel
   replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
       app: snowflake
+  serviceName: ""
   template:
     metadata:
+      creationTimestamp: null
       labels:
         app: snowflake
     spec:
@@ -23,6 +30,8 @@ spec:
         env:
         - name: DOCKER_HOST
           value: tcp://localhost:2375
+        - name: JENKINS_SLAVE_AGENT_PORT
+          value: "20000"
         image: docker:27.1.1-dind
         imagePullPolicy: Always
         livenessProbe:
@@ -108,39 +117,22 @@ spec:
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
       - env:
-        - name: JAVA_ARGS
-          value: "-javaagent:/usr/share/jenkins/jmx_prometheus_javaagent-0.11.0.jar=localhost:8080:/usr/share/jenkins/jmx_exporter.yaml"
         - name: DOCKER_HOST
           value: tcp://localhost:2375
-        - name: JSWARM_URL
-          value: https://rubin-ci.slac.stanford.edu/
-        - name: JSWARM_TUNNEL
-          value: 134.79.23.234:20000
-        - name: JSWARM_MODE
-          value: normal
-        - name: JSWARM_LABELS
-          value: snowflake-0
-        - name: JSWARM_EXECUTORS
-          value: "1"
-        - name: JSWARM_AGENT_NAME
+        - name: JENKINS_URL
+          value: http://jenkins.jenkins.svc.cluster.local:8080
+        - name: JENKINS_TUNNEL
+          value: jenkins-agent.jenkins.svc.cluster.local:20000
+        - name: JENKINS_AGENT_NAME
           valueFrom:
             fieldRef:
               apiVersion: v1
               fieldPath: metadata.name
-        - name: JSWARM_DISABLE_CLIENTS_UNIQUE_ID
-          value: "true"
-        - name: JSWARM_DELETE_EXISTING_CLIENTS
-          value: "true"
-        - name: JSWARM_USERNAME
+        - name: JENKINS_SECRET
           valueFrom:
             secretKeyRef:
-              key: JSWARM_USERNAME
-              name: agent-ldfc
-        - name: JSWARM_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              key: JSWARM_PASSWORD
-              name: agent-ldfc
+              key: jenkins-secret
+              name: snowflake-secret
         - name: K8S_NODE_NAME
           valueFrom:
             fieldRef:
@@ -156,125 +148,38 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: status.podIP
-        - name: K8S_SWARM_REQUESTS_CPU
-          valueFrom:
-            resourceFieldRef:
-              containerName: swarm
-              divisor: "0"
-              resource: requests.cpu
-        - name: K8S_SWARM_LIMITS_CPU
-          valueFrom:
-            resourceFieldRef:
-              containerName: swarm
-              divisor: "0"
-              resource: limits.cpu
-        - name: K8S_SWARM_REQUESTS_MEMORY_GI
-          valueFrom:
-            resourceFieldRef:
-              containerName: swarm
-              divisor: 1Gi
-              resource: requests.memory
-        - name: K8S_SWARM_LIMITS_MEMORY_GI
-          valueFrom:
-            resourceFieldRef:
-              containerName: swarm
-              divisor: 1Gi
-              resource: limits.memory
-        - name: K8S_DIND_REQUESTS_CPU
-          valueFrom:
-            resourceFieldRef:
-              containerName: dind
-              divisor: "0"
-              resource: requests.cpu
-        - name: K8S_DIND_LIMITS_CPU
-          valueFrom:
-            resourceFieldRef:
-              containerName: dind
-              divisor: "0"
-              resource: limits.cpu
-        - name: K8S_DIND_REQUESTS_MEMORY_GI
-          valueFrom:
-            resourceFieldRef:
-              containerName: dind
-              divisor: 1Gi
-              resource: requests.memory
-        - name: K8S_DIND_LIMITS_MEMORY_GI
-          valueFrom:
-            resourceFieldRef:
-              containerName: dind
-              divisor: 1Gi
-              resource: limits.memory
-        - name: K8S_DOCKER_GC_REQUESTS_CPU_M
-          valueFrom:
-            resourceFieldRef:
-              containerName: docker-gc
-              divisor: 1m
-              resource: requests.cpu
-        - name: K8S_DOCKER_GC_LIMITS_CPU_M
-          valueFrom:
-            resourceFieldRef:
-              containerName: docker-gc
-              divisor: 1m
-              resource: limits.cpu
-        - name: K8S_DOCKER_GC_REQUESTS_MEMORY_MI
-          valueFrom:
-            resourceFieldRef:
-              containerName: docker-gc
-              divisor: 1Mi
-              resource: requests.memory
-        - name: K8S_DOCKER_GC_LIMITS_MEMORY_MI
-          valueFrom:
-            resourceFieldRef:
-              containerName: docker-gc
-              divisor: 1Mi
-              resource: limits.memory
-        image: ghcr.io/lsst-dm/jenkins-swarm-client:latest
+        - name: AGENT_WORKDIR
+          value: /j
+        image: ghcr.io/lsst-dm/jenkins-jnlp-client:latest
         imagePullPolicy: Always
-        livenessProbe:
-          exec:
-            command:
-            - wget
-            - --spider
-            - -q
-            - http://127.0.0.1:8080/metrics
-          failureThreshold: 2
-          initialDelaySeconds: 5
-          periodSeconds: 5
-          successThreshold: 1
-          timeoutSeconds: 1
-        name: swarm
-        readinessProbe:
-          exec:
-            command:
-            - wget
-            - --spider
-            - -q
-            - http://127.0.0.1:8080/metrics
-          failureThreshold: 2
-          initialDelaySeconds: 5
-          periodSeconds: 5
-          successThreshold: 1
-          timeoutSeconds: 1
+        name: jnlp
         resources:
           limits:
-            cpu: "1"
-            memory: 2Gi
+            cpu: "8"
+            memory: 64Gi
           requests:
-            cpu: "1"
-            memory: 2Gi
+            cpu: "8"
+            memory: 64Gi
         securityContext:
           allowPrivilegeEscalation: true
           privileged: false
           readOnlyRootFilesystem: false
-          runAsGroup: 202
+          runAsGroup: 1000
           runAsNonRoot: false
-          runAsUser: 48435
+          runAsUser: 1000
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
+        tty: true
         volumeMounts:
+        - mountPath: /var/lib/docker
+          name: docker-graph-storage
         - mountPath: /j
           name: ws-snowflake
+        workingDir: /j
       dnsPolicy: ClusterFirst
+      nodeSelector:
+        cloud.google.com/gke-nodepool: jenkins-workers-multiarch-c4a
+        kubernetes.io/arch: arm64
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext:
@@ -284,18 +189,20 @@ spec:
         runAsUser: 0
       shareProcessNamespace: false
       terminationGracePeriodSeconds: 30
+      tolerations:
+      - effect: NoExecute
+        key: workload
+        operator: Equal
+        value: snowflake
+      - effect: NoSchedule
+        key: kubernetes.io/arch
+        operator: Equal
+        value: arm64
       volumes:
       - emptyDir: {}
         name: docker-graph-storage
+      - name: ws-snowflake
+        persistentVolumeClaim:
+          claimName: snowflake-pvc
   updateStrategy:
     type: RollingUpdate
-  volumeClaimTemplates:
-  - metadata:
-      name: ws-snowflake
-    spec:
-      accessModes:
-      - ReadWriteOnce
-      resources:
-        requests:
-          storage: "1500Gi"
-      volumeMode: Filesystem
