@@ -3,7 +3,7 @@ allowedTopologies:
 - matchLabelExpressions:
   - key: topology.gke.io/zone
     values:
-    - us-central1-a
+    - us-central1-c
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
