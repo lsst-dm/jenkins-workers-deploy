@@ -111,6 +111,18 @@ resource "google_compute_global_address" "atlantis" {
   purpose            = null
 }
 
+resource "google_compute_global_address" "grafana" {
+  name               = "grafana"
+  address_type       = "EXTERNAL"
+  description        = "Static external IP for deploying grafana."
+  labels             = {}
+  network            = null
+  ip_version         = "IPV4"
+  prefix_length      = 0
+  project            = "prompt-proto"
+  purpose            = null
+}
+
 resource "google_compute_global_address" "vault-external" {
   name               = "vault-external"    
   address            = "34.110.184.84"
