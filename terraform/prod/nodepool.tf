@@ -9,7 +9,6 @@ resource "google_container_node_pool" "jenkins_controls_standard" {
   location          = google_container_cluster.jenkins_test.location
   max_pods_per_node = 110
   name              = "jenkins-controls-standard"
-  node_count        = 2
   node_locations = [
     "us-central1-c",
   ]
@@ -76,7 +75,6 @@ resource "google_container_node_pool" "jenkins_workers_c4d" {
   location           = google_container_cluster.jenkins_test.location
   max_pods_per_node  = 110
   name               = "jenkins-workers-c4d"
-  node_count         = 0
   initial_node_count = 4
   autoscaling {
     min_node_count       = 0
