@@ -33,6 +33,7 @@ resource "google_service_account" "usdf_pp_docker_pull" {
   account_id   = "usdf-pp-docker-pull"
   description  = "usdf prompt processing docker pull secret"
   display_name = "usdf-pp-docker-pull"
+  disabled     = "true"
 }
 resource "google_service_account" "vault_google_oauth" {
   account_id   = "vault-google-oauth"
