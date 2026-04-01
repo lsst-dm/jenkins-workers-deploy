@@ -32,6 +32,7 @@ Once the PR has been reviewed and approved, you can apply these changes to our g
 ```text
 atlantis apply
 ```
+Ensure you do this BEFORE you merge your PR, otherwise it will not be able to apply.
 
 ### 4. Unlock
 Locks and plans after `atlantis apply` will be removed. If you need to close the PR without applying, or want to delete plans and locks, do `atlantis unlock`. This is not required if you did `atlantis apply`.

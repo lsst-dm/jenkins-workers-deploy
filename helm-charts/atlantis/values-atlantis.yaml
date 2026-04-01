@@ -15,7 +15,7 @@ atlantisUrl: "https://ci-atlantis.lsst.cloud/"
 # Example:  http://10.0.0.0
 
 # -- Replace this with your own repo allowlist.
-orgAllowlist: "github.com/lsst-dm/jenkins-workers-deploy"
+orgAllowlist: "github.com/lsst-dm/jenkins-dm-workers"
 
 # -- Deprecated in favor of orgAllowlist.
 orgWhitelist: "<deprecated>"

@@ -113,6 +113,7 @@ resource "google_compute_global_address" "atlantis" {
 
 resource "google_compute_global_address" "grafana" {
   name               = "grafana"
+  address            = "35.190.2.90"
   address_type       = "EXTERNAL"
   description        = "Static external IP for deploying grafana."
   labels             = {}
