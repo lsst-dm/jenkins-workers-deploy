@@ -98,7 +98,7 @@ resource "google_container_node_pool" "jenkins_workers_c4d" {
   }
 
   node_config {
-    disk_size_gb                = 300
+    disk_size_gb                = 900
     disk_type                   = "hyperdisk-balanced"
     enable_confidential_storage = false
     image_type                  = "COS_CONTAINERD"
@@ -174,7 +174,7 @@ resource "google_container_node_pool" "jenkins_workers_multiarch_c4a" {
   }
 
   node_config {
-    disk_size_gb                = 300
+    disk_size_gb                = 900
     disk_type                   = "hyperdisk-balanced"
     enable_confidential_storage = false
     image_type                  = "COS_CONTAINERD"
