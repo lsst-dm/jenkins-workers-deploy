@@ -38,7 +38,7 @@ spec:
             secretKeyRef:
               key: jenkins-secret
               name: manager-dev-secret
-        image: jenkins/inbound-agent:jdk17
+        image: jenkins/inbound-agent:jdk21
         imagePullPolicy: IfNotPresent
         name: jnlp
         resources:
